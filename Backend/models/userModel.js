@@ -21,7 +21,7 @@
         },
         role: {
             type: String,
-            enum: ["admin", "customer", "mechanic"],
+            enum: ["customer", "garageManager", "admin"],
             default: "customer",
         },
     }, {
