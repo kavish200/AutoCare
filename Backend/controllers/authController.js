@@ -2,6 +2,7 @@ const User = require("../models/userModel");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const config = require("../config/config");
+const sessionModel = require("../models/sessionModel");
 
 // Register a new user
 const register = async (req, res) => {
@@ -31,16 +32,25 @@ const register = async (req, res) => {
             role: role || "customer"    
         })
 
-        const accessToken = jwt.sign({
-            id: user._id,
-        }, config.JWT_SECRET, {
-            expiresIn: "15m"
-        })
-
         const refreshToken = jwt.sign({
             id: user._id,
         }, config.JWT_SECRET, {
             expiresIn: "7d"
+        })
+
+        const refreshTokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
+
+        const session = await sessionModel.create({
+            userId: user._id,
+            refreshTokenHash,
+            ip: req.ip,
+            userAgent: req.headers["user-agent"]
+        })
+
+        const accessToken = jwt.sign({
+            id: user._id,
+        }, config.JWT_SECRET, {
+            expiresIn: "15m"
         })
 
         res.cookie("refreshToken", refreshToken, {
@@ -68,6 +78,70 @@ const register = async (req, res) => {
         })
     }
 }
+
+// Login existing user
+// const login = async(req, res) => {
+//     const {email, password} = req.body;
+
+//     const user = await User.findOne({
+//         email
+//     })
+
+//     if(!user) {
+//         return res.status(404).json({
+//             message: "Invalid email or password"
+//         })
+//     }
+
+//     const hashedPassword = await crypto.createHash("sha256").update(password).digest("hex");
+//     const isPasswordValid = hashedPassword === user.password;
+
+//     if(!isPasswordValid) {
+//         return res.status(401).json({
+//             message: "Invalid email or password"
+//         })
+//     }
+
+//     const refreshToken = jwt.sign({
+//         id: user._id
+//     }, config.JWT_SECRET, {
+//         expiresIn: "7d"
+//     })
+
+//     const refreshTokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
+
+//     const session = await sessionModel.create({
+//         user: user._id,
+//         refreshTokenHash,
+//         ip: req.ip,
+//         userAgent: req.headers["user-agent"]
+//     })
+
+//     const accessToken = jwt.sign({
+//         id: user._id,
+//         sessionId: session._id
+//     }, config.JWT_SECRET, {
+//         expiresIn: "15m"
+//     })
+
+//     res.cookie("resfreshToken", refreshToken, {
+//         httpOnly: true,
+//         secure: true,
+//         sameSite: "strict",
+//         maxAge: 7 * 24 * 60 * 60 * 1000
+//     })
+
+
+//     res.status(200).json({
+//         message: "User logged in successfully!",
+//         user: {
+//             username: user.username,
+//             email: user.email,
+//             phone: user.phone
+//         },
+//         accessToken,
+//     })
+// }
 
 // Get the details of the user
 const getMe = async (req, res) => {
