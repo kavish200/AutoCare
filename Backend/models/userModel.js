@@ -14,6 +14,10 @@
             type: String,
             required: true,
         },
+        verified: {
+            type: Boolean,
+            default: false,
+        },
         phone: {
             type: Number,
             required: true,
