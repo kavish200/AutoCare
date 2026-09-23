@@ -9,4 +9,4 @@ router.get("/refreshToken", refreshToken);
 router.get("/logout", logout);
 router.post("/verifyEmail", verifyEmail);
 
-module.exports = {router};
+module.exports = router;
