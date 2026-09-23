@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const vehcileSchema = new mongoose.Schema({
+const vehicleSchema = new mongoose.Schema({
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -30,5 +30,5 @@ const vehcileSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-const Vehcile = mongoose.model("vehicles", vehcileSchema);
-module.exports = Vehcile;
+const Vehicle = mongoose.model("vehicles", vehicleSchema);
+module.exports = Vehicle;

@@ -4,6 +4,7 @@ const config = require("./config/config");
 const connectDB = require("./config/db");
 const authRoute = require("./routes/authRoute");
 const userRoute = require("./routes/userRoute");
+const vehicleRoute = require("./routes/vehicleRoute");
 const cookieParser = require("cookie-parser");
 const PORT = config.PORT
 
@@ -17,7 +18,8 @@ app.get("/", (req, res) => {
 })
 
 app.use("/api/auth", authRoute);
-app.use("/api/user", userRoute)
+app.use("/api/user", userRoute);
+app.use("/api/vehicle", vehicleRoute);
 
 app.listen(PORT, () => {
     console.log("Listening on port 3000");
