@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const serviceSchema = new mongoose.Schema({
-    owner: {
+    garage: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Garage",
         required: true,

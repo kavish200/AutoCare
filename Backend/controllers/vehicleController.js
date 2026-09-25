@@ -77,4 +77,72 @@ const getVehicleById = async (req, res) => {
     }
 }
 
-module.exports = {createVehicle, getVehicles, getVehicleById};
+//Update Vehicle by its id
+const updateVehicle = async (req, res) => {
+    try {
+        const vehicle = await Vehicle.findById(req.params.id);
+        if(!vehicle) {
+            return res.status(404).json({
+                message: "Vehicle not found"
+            });
+        }
+
+        if(vehicle.owner.toString() !== req.user.id) {
+            return res.status(403).json({
+                message: "Access denied. You are not the owner of this vehicle."
+            })
+        }
+
+        const {registrationNumber, brand, model, year, fuelType} = req.body;
+
+        const updatedVehicle = await Vehicle.findByIdAndUpdate(req.params.id, {
+            registrationNumber,
+            brand,
+            model,
+            year,
+            fuelType
+        }, {new: true}
+    );
+
+    res.status(200).json({
+        message: "Vehicle updated successfully!",
+        updatedVehicle
+    });
+    } catch(err) {
+        res.status(500).json({
+            message: "Error in updating vehicle",
+            error: err.message
+        })
+    }
+}
+
+//Delete Vehicle by Id
+const deleteVehicle = async (req, res) => {
+    try{
+        const vehicle = await Vehicle.findById(req.params.id);
+        if(!vehicle) {
+            return res.status(404).json({
+                message: "Vehicle not found!"
+            })
+        }
+        if(vehicle.owner.toString() !== req.user.id) {
+            return res.status(403).json({
+                message: "Access denied. You are not the owner of this vehicle."
+            })
+        }
+
+        const deletedVehicle = await Vehicle.findByIdAndDelete(req.params.id);
+
+        res.status(200).json({
+            message: "Vehicle deleted succussfully!",
+            deletedVehicle
+        });
+    } catch(err) {
+        res.status(500).json({
+            message: "Error in deleting vehicle",
+            error: err.message
+        });
+    }
+};
+
+module.exports = {createVehicle, getVehicles, getVehicleById, updateVehicle, deleteVehicle};

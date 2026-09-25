@@ -19,10 +19,6 @@ const garageSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    services: {
-        type: [String],
-        required: true,
-    }
 })
 
 const Garage = mongoose.model("garages", garageSchema);
