@@ -107,7 +107,7 @@ const updateService = async (req, res) => {
         const {name, price} = req.body;
 
         const garage = await Garage.findOne({
-            owner: req.params.id
+            owner: req.user.id
         })
 
         if(!garage) {

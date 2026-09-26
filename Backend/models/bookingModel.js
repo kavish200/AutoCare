@@ -18,7 +18,7 @@ const bookingSchema = new mongoose.Schema({
     },
     service: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Serice",
+        ref: "Service",
         required: true,
     },
     appointmentDate: {
@@ -30,4 +30,9 @@ const bookingSchema = new mongoose.Schema({
         enum: ["BOOKED", "CONFIRMED", "CANCELLED", "COMPLETED"],
         default: "BOOKED",
     }
+}, {
+    timestamps: true
 })
+
+const Booking = mongoose.model("Booking", bookingSchema);
+module.exports = Booking;
