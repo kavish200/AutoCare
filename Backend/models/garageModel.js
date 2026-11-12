@@ -21,5 +21,5 @@ const garageSchema = new mongoose.Schema({
     },
 })
 
-const Garage = mongoose.model("garages", garageSchema);
+const Garage = mongoose.model("Garage", garageSchema);
 module.exports = Garage;

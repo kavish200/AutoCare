@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const config = require("./config/config");
+const cors = require("cors");
 const connectDB = require("./config/db");
 const authRoute = require("./routes/authRoute");
 const vehicleRoute = require("./routes/vehicleRoute");
@@ -9,6 +10,11 @@ const garageRoute = require("./routes/garageRoute");
 const bookingRoute = require("./routes/bookingRoute");
 const cookieParser = require("cookie-parser");
 const PORT = config.PORT
+
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
 
 connectDB();
 

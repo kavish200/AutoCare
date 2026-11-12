@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {createGarage, getGarage, getGarageById, updateGarage, deleteGarage} = require("../controllers/garageController");
+const {createGarage, getGarage, getGarageById, updateGarage, deleteGarage, getAllGarages} = require("../controllers/garageController");
 const verifyToken = require("../middlewares/authMiddleware");
 const authorizRole = require("../middlewares/roleMiddleware");
 
@@ -9,5 +9,5 @@ router.get("/getGarage", verifyToken, authorizRole("garageManager"), getGarage);
 router.get("/getGarage/:id", verifyToken, authorizRole("garageManager"), getGarageById);
 router.put("/updateGarage/:id", verifyToken, authorizRole("garageManager"), updateGarage);
 router.delete("/deleteGarage/:id", verifyToken, authorizRole("garageManager"), deleteGarage);
-
+router.get("/getAllGarages", verifyToken, authorizRole("customer"), getAllGarages);
 module.exports = router;

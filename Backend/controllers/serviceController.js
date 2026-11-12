@@ -177,4 +177,30 @@ const deleteService = async (req, res) => {
     }
 };
 
-module.exports = {createService, getServices, getServicesById, updateService, deleteService};
+const getServicesByGarage = async (req, res) => {
+    try {
+        const garage = await Garage.findById(req.params.garageId);
+
+        if(!garage) {
+            return res.status(404).json({
+                message: "Garage not found!"
+            });
+        }
+
+        const services = await Service.find({
+            garage: garage._id
+        });
+
+        res.status(200).json({
+            message: "Services fetched successfully!",
+            services
+        });
+    } catch(err) {
+        res.status(500).json({
+            message: "Error fetching services",
+            error: err.message
+        });
+    }
+};
+
+module.exports = {createService, getServices, getServicesById, updateService, deleteService, getServicesByGarage};

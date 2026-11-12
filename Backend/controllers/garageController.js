@@ -148,4 +148,21 @@ const deleteGarage = async (req, res) => {
         })
     }
 };
-module.exports = {createGarage, getGarage, getGarageById, updateGarage, deleteGarage};
+
+const getAllGarages = async (req, res) => {
+    try {
+        const garages = await Garage.find()
+            .select("name phone address");
+
+        res.status(200).json({
+            message: "Garages fetched successfully!",
+            garages
+        });
+    } catch(err) {
+        res.status(500).json({
+            message: "Error fetching garages",
+            error: err.message
+        });
+    }
+};
+module.exports = {createGarage, getGarage, getGarageById, updateGarage, deleteGarage, getAllGarages};

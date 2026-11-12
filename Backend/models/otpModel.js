@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 
 const otpSchema = new mongoose.Schema({
@@ -12,11 +13,14 @@ const otpSchema = new mongoose.Schema({
     },
     otpHash: {
         type: String,
-        require: [true, "OTP hash is required"]
+        required: [true, "OTP hash is required"]
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+        expires: 300
     }
-}, {
-    timestamps: true
-})
+});
 
 const otpModel = mongoose.model("Otp", otpSchema);
 module.exports = otpModel;

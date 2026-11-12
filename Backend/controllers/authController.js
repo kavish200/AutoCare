@@ -139,30 +139,83 @@ const login = async (req, res) => {
     })
 }
 
-// Get the details of the user
+// Get the details of the logged-in user
 const getMe = async (req, res) => {
-    const token = req.headers.authorization.split(" ")[1];
+    try {
+        const user = await User.findById(req.user.id).select("-password");
 
-    if(!token) {
-        return res.status(401).json({
-            message: "Token not found"
-        })
-    }
-
-    const decode = jwt.verify(token, config.JWT_SECRET);
-
-    const user = await User.findById(decode.id);
-
-    res.status(200).json({
-        message: "User details fetched successfully!",
-        user: {
-            username: user.username,
-            email: user.email,
-            phone: user.phone,
-            role: user.role
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
         }
-    })
-}
+
+        res.status(200).json({
+            message: "User details fetched successfully!",
+            user: {
+                username: user.username,
+                email: user.email,
+                phone: user.phone,
+                role: user.role,
+                verified: user.verified
+            }
+        });
+
+    } catch (err) {
+        res.status(500).json({
+            message: "Internal server error",
+            error: err.message
+        });
+    }
+};
+
+
+const updateProfile = async (req, res) => {
+    try {
+        const { username, phone } = req.body;
+
+        if (!username || !phone) {
+            return res.status(400).json({
+                message: "Username and phone are required"
+            });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            {
+                username,
+                phone
+            },
+            {
+                new: true,
+                runValidators: true
+            }
+        ).select("-password");
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        res.status(200).json({
+            message: "Profile updated successfully!",
+            user: {
+                username: user.username,
+                email: user.email,
+                phone: user.phone,
+                role: user.role,
+                verified: user.verified
+            }
+        });
+
+    } catch (err) {
+        res.status(500).json({
+            message: "Internal server error",
+            error: err.message
+        });
+    }
+};
 
 // Refresh the access token using refresh token
 const refreshToken = async (req, res) => {
@@ -251,37 +304,52 @@ const logout = async (req, res) => {
 }
 
 const verifyEmail = async (req, res) => {
-    const {email, otp} = req.body;
-    const otpHash = crypto.createHash("sha256").update(otp).digest("hex");
+    try {
+        const { email, otp } = req.body;
 
-    const otpDoc = await otpModel.findOne({
-        email,
-        otpHash
-    })
+        const otpHash = crypto
+            .createHash("sha256")
+            .update(otp)
+            .digest("hex");
 
-    if(!otpDoc) {
-        return res.status(400).json({
-            message: "Invalid OTP"
-        })
+        const otpDoc = await otpModel.findOne({
+            email,
+            otpHash
+        });
+
+        if (!otpDoc) {
+            return res.status(400).json({
+                message: "Invalid or expired OTP"
+            });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            otpDoc.user,
+            { verified: true },
+            { new: true }
+        );
+
+        await otpModel.deleteMany({
+            user: otpDoc.user
+        });
+
+        return res.status(200).json({
+            message: "Email verified successfully!",
+            user: {
+                username: user.username,
+                email: user.email,
+                phone: user.phone,
+                role: user.role,
+                verified: user.verified
+            }
+        });
+
+    } catch (err) {
+        return res.status(500).json({
+            message: "Internal server error",
+            error: err.message
+        });
     }
+};
 
-    const user = await User.findByIdAndUpdate(otpDoc.user, {
-        verified: true
-    })
-
-    await otpModel.deleteMany({
-        user: otpDoc.user
-    })
-
-    return res.status(200).json({
-        message: "Email verified successfully!",
-        user: {
-            username: user.username,
-            email: user.email,
-            phone: user.phone,
-            role: user.role,
-            verified: user.verified
-        }  
-    })
-}
-module.exports = {login, logout, register, getMe, refreshToken, verifyEmail};
+module.exports = {login, logout, register, getMe, updateProfile, refreshToken, verifyEmail};

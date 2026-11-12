@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {createService, getServices, getServicesById, updateService, deleteService} = require("../controllers/serviceController");
+const {createService, getServices, getServicesById, updateService, deleteService, getServicesByGarage} = require("../controllers/serviceController");
 const verifyToken = require("../middlewares/authMiddleware");
 const authorizeRole = require("../middlewares/roleMiddleware");
 
@@ -9,5 +9,6 @@ router.get("/getServices", verifyToken, authorizeRole("garageManager"), getServi
 router.get("/getServicesById/:id", verifyToken, authorizeRole("garageManager"), getServicesById);
 router.put("/updateService/:id", verifyToken, authorizeRole("garageManager"), updateService);
 router.delete("/deleteService/:id", verifyToken, authorizeRole("garageManager"), deleteService);
+router.get("/getServicesByGarage/:garageId", verifyToken, authorizeRole("customer"), getServicesByGarage);
 
 module.exports = router;

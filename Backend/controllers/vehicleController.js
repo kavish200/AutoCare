@@ -32,7 +32,7 @@ const getVehicles = async (req, res) => {
         const vehicles = await Vehicle.find({
             owner: req.user.id
         })
-        if(!vehicles) {
+        if(vehicles.length === 0) {
             return res.status(404).json({
                 message: "No vehicles found for this owner"
             })
@@ -53,7 +53,7 @@ const getVehicles = async (req, res) => {
 const getVehicleById = async (req, res) => {
     try {
         const vehicle = await Vehicle.findById(req.params.id);
-        if(vehicle.length === 0) {
+        if(!vehicle) {
             return res.status(404).json({
                 message: "Vehicle not found"
             })
